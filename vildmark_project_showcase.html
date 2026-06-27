@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vildmark Project Showcase</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for the menu -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-color: #313833;
+            --container-bg: #EAEBE9;
+            --accent-red: #F25041;
+            --text-dark: #2B2B2B;
+            --text-light: #6B6B6B;
+            --transition-timing: cubic-bezier(0.85, 0, 0.15, 1);
+            --transition-duration: 0.8s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .showcase-container {
+            background-color: var(--container-bg);
+            width: 90vw;
+            height: 85vh;
+            max-width: 1400px;
+            max-height: 800px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Typography */
+        h1, h2, .serif-text {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Accordion Layout */
+        .accordion-wrapper {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            padding: 0 40px;
+            box-sizing: border-box;
+            position: relative;
+            /* Container for the panels */
+            align-items: stretch;
+            gap: 0;
+        }
+
+        .panel {
+            position: relative;
+            height: 100%;
+            /* Flex basis determines initial and active widths */
+            flex: 0 0 50px; /* Reduced width to accommodate 10 panels */
+            transition: flex var(--transition-duration) var(--transition-timing), width var(--transition-duration) var(--transition-timing);
+            overflow: hidden;
+            cursor: pointer;
+            border-right: 1px solid rgba(0,0,0,0.05);
+            background-color: transparent;
+        }
+
+        /* The last panel doesn't need a border unless it's colored */
+        .panel:last-child {
+            border-right: none;
+        }
+
+        /* Specific panel backgrounds for 10 items */
+        .panel[data-index="1"] { background-color: #1a1a1a; color: white; }
+        .panel[data-index="2"] { background-color: #E2E4E1; }
+        .panel[data-index="3"] { background-color: #D3D5D1; }
+        .panel[data-index="4"] { background-color: #B9BCB6; }
+        .panel[data-index="5"] { background-color: #A3A6A1; }
+        .panel[data-index="6"] { background-color: #8C8F8A; color: white; }
+        .panel[data-index="7"] { background-color: #757873; color: white; }
+        .panel[data-index="8"] { background-color: #5E615C; color: white; }
+        .panel[data-index="9"] { background-color: #474A45; color: white; }
+        .panel[data-index="10"] { background-color: var(--accent-red); color: white; }
+
+        .panel.active {
+            /* Active width takes up remaining space */
+            flex: 1 1 0%;
+            width: auto;
+            cursor: default;
+        }
+
+        /* Number Styling */
+        .panel-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            line-height: 1;
+            position: absolute;
+            top: 100px;
+            left: 8px;
+            transition: all var(--transition-duration) var(--transition-timing);
+            z-index: 10;
+        }
+
+        .panel.active .panel-number {
+            top: 40px;
+            font-size: 2.5rem;
+            left: 20px;
+        }
+
+        /* Panel Content Area */
+        .panel-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            transition-delay: 0s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel.active .panel-content {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0.3s; /* Fade in after expansion starts */
+        }
+
+        /* Inner Content Layout */
+        .content-inner {
+            padding: 40px 40px 40px 80px; /* Space for the smaller number */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .panel-header {
+            margin-bottom: 30px;
+        }
+
+        .panel-meta {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        /* Text colors for darker panels */
+        .panel[data-index="1"] .panel-meta, .panel[data-index="1"] .panel-title,
+        .panel[data-index="6"] .panel-meta, .panel[data-index="6"] .panel-title,
+        .panel[data-index="7"] .panel-meta, .panel[data-index="7"] .panel-title,
+        .panel[data-index="8"] .panel-meta, .panel[data-index="8"] .panel-title,
+        .panel[data-index="9"] .panel-meta, .panel[data-index="9"] .panel-title,
+        .panel[data-index="10"] .panel-meta, .panel[data-index="10"] .panel-title {
+            color: white;
+        }
+
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--accent-red);
+            line-height: 1.1;
+        }
+        
+        /* Image Styling */
+        .image-container {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .panel-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Parallax effect attempt */
+            transform: scale(1.1);
+            transition: transform var(--transition-duration) var(--transition-timing);
+        }
+
+        .panel.active .panel-img {
+            transform: scale(1);
+        }
+
+        .panel-description {
+            display: flex;
+            gap: 20px;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            color: var(--text-light);
+        }
+        
+        .panel[data-index="1"] .panel-description,
+        .panel[data-index="6"] .panel-description,
+        .panel[data-index="7"] .panel-description,
+        .panel[data-index="8"] .panel-description,
+        .panel[data-index="9"] .panel-description,
+        .panel[data-index="10"] .panel-description {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .desc-col {
+            flex: 1;
+        }
+
+        /* Static text blocks on the left and right */
+        .static-text {
+            position: absolute;
+            bottom: 40px;
+            font-size: 0.65rem;
+            line-height: 1.5;
+            color: var(--text-light);
+            width: 250px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 5;
+        }
+
+        .static-text.left {
+            left: 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 40px;
+            z-index: 20;
+            position: relative;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* Small thumb image on the left */
+        .thumb-image {
+            position: absolute;
+            top: 150px;
+            left: 40px;
+            width: 120px;
+            height: 160px;
+            object-fit: cover;
+            z-index: 5;
+            filter: grayscale(100%);
+        }
+
+        /* Preloader */
+        .preloader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--container-bg);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease-in-out;
+        }
+        .preloader-brand {
+            font-size: 3rem;
+            letter-spacing: 0.2em;
+            opacity: 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Hide elements during intro */
+        .intro-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+        
+        .intro-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Adjustments for panels container */
+        .panels-container {
+            display: flex;
+            position: absolute;
+            left: 200px; /* Offset from left text/img */
+            right: 40px; /* Offset from right edge */
+            height: calc(100% - 100px); /* Adjust based on header */
+            top: 100px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="showcase-container">
+        
+        <!-- Preloader -->
+        <div class="preloader" id="preloader">
+            <h1 class="brand-title serif-text preloader-brand">PORTFOLIO*</h1>
+        </div>
+
+        <!-- Header -->
+        <header class="header-top intro-hidden" id="header">
+            <h1 class="brand-title">WORKS<sup style="font-size: 1rem;">*</sup></h1>
+            <button class="menu-btn">
+                <i class="ph ph-list"></i>
+            </button>
+        </header>
+
+        <!-- Static Left Elements -->
+        <img src="https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=500&auto=format&fit=crop" alt="Profile" class="thumb-image intro-hidden" id="thumb-img">
+        
+        <div class="static-text left intro-hidden" id="static-desc">
+            A curated showcase of recent projects, highlighting innovative web applications, user-centric design, and cutting-edge development.
+        </div>
+
+        <div class="panels-container intro-hidden" id="panels-container">
+            
+            <!-- Panel 1 -->
+            <div class="panel active" data-index="1">
+                <div class="panel-number">1</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Fintech / React</div>
+                            <h2 class="panel-title serif-text">SPEAK TO SPEND</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1563013544-824eae8a598d?q=80&w=1200&auto=format&fit=crop" alt="Digital Payment" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                A revolutionary React-based payment application that enables users to make payments entirely through voice commands. Features global voice navigation, intelligent form filling, and real-time speech recognition for accessibility.
+                            </div>
+                            <div class="desc-col">
+                                Built with bank-grade security protocols, biometric voice authentication, and comprehensive screen reader support. It leverages the Web Speech API and an AI-powered chatbot to create a seamless, hands-free transaction experience.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2 -->
+            <div class="panel" data-index="2">
+                <div class="panel-number">2</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Journal / Sponsored</div>
+                            <h2 class="panel-title serif-text">THE MOST REFINED MOUNTAINEERING EQUIPMENT</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop" alt="Mountains" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                Creating the most durable, reliable and sustainable equipment possible. What hasn't changed is the growing appreciation among the public at large for the uncompromising design that Haglofs incorporates into their gear...
+                            </div>
+                            <div class="desc-col">
+                                Professionals, users have always appreciated the underlying reliability and technical know-how of a Haglofs backpack. The moderate efforts made towards sustainability in production have led to a certain amount of respect among people who...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3 -->
+            <div class="panel" data-index="3">
+                <div class="panel-number">3</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Outdoor Adventure</div>
+                            <h2 class="panel-title serif-text">RIGHT PLACE, RIGHT TIME</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=1200&auto=format&fit=crop" alt="Snowy Mountains" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                The journey into the unknown requires preparation, but also the willingness to surrender to the elements. Finding the perfect moment in the harsh wilderness is a blend of skill, patience, and luck.
+                            </div>
+                            <div class="desc-col">
+                                We document these fleeting instances where light, landscape, and human endeavor align perfectly. It's about capturing the essence of the wild.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 4 -->
+            <div class="panel" data-index="4">
+                <div class="panel-number">4</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Expedition Log</div>
+                            <h2 class="panel-title serif-text">BEYOND THE TREE LINE</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1522345091726-2917631341ba?q=80&w=1200&auto=format&fit=crop" alt="High Altitude" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                As you ascend, the world changes. The air thins, vegetation disappears, and you are left with rock, ice, and sky. This is where true resilience is tested.
+                            </div>
+                            <div class="desc-col">
+                                Our latest expedition pushes the boundaries of endurance, exploring regions rarely seen by human eyes.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 5 -->
+            <div class="panel" data-index="5">
+                <div class="panel-number">5</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Web Platform</div>
+                            <h2 class="panel-title serif-text">ECO-TRACKER DASHBOARD</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?q=80&w=1200&auto=format&fit=crop" alt="Eco Dashboard" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                A comprehensive platform for tracking carbon footprint and environmental impact across corporate offices. Implements real-time data visualization using D3.js and automated reporting features.
+                            </div>
+                            <div class="desc-col">
+                                Successfully deployed to 50+ enterprise clients, resulting in an average 15% reduction in energy waste through predictive AI recommendations and smart IoT integrations.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 6 -->
+            <div class="panel" data-index="6">
+                <div class="panel-number">6</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Mobile App</div>
+                            <h2 class="panel-title serif-text">URBAN TRANSIT NAVIGATOR</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1200&auto=format&fit=crop" alt="City Transit" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                Smart city transit application providing real-time bus and train routing. Built with React Native and utilizing city-wide open data APIs to deliver millisecond-accurate arrival times.
+                            </div>
+                            <div class="desc-col">
+                                Features an offline mode for subway navigation and an augmented reality view to help tourists find their stops in crowded metropolitan areas.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 7 -->
+            <div class="panel" data-index="7">
+                <div class="panel-number">7</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">AI / Machine Learning</div>
+                            <h2 class="panel-title serif-text">NEURALNET IMAGE SYNTHESIS</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1200&auto=format&fit=crop" alt="AI abstract" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                An experimental generative AI platform built on PyTorch that synthesizes photorealistic textures for 3D modeling from simple text prompts.
+                            </div>
+                            <div class="desc-col">
+                                Optimized for web delivery using WebAssembly, allowing complex inference models to run directly in the user's browser without heavy server compute costs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 8 -->
+            <div class="panel" data-index="8">
+                <div class="panel-number">8</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Healthcare</div>
+                            <h2 class="panel-title serif-text">HEALTH CONNECT PORTAL</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop" alt="Medical Technology" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                A secure, HIPAA-compliant telemedicine platform connecting patients with specialists worldwide. Features integrated HD video conferencing and secure document sharing.
+                            </div>
+                            <div class="desc-col">
+                                Processed over 10,000 successful remote consultations in its first year, significantly reducing wait times for specialized care in rural communities.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 9 -->
+            <div class="panel" data-index="9">
+                <div class="panel-number">9</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Blockchain</div>
+                            <h2 class="panel-title serif-text">CRYPTO FLOW DEFI</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1639762681485-074b7f4ec651?q=80&w=1200&auto=format&fit=crop" alt="Blockchain" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                A decentralized finance dashboard that aggregates liquidity pools across multiple chains. Built with Next.js, Web3.js, and smart contracts deployed on Ethereum.
+                            </div>
+                            <div class="desc-col">
+                                Designed with a focus on UI/UX to simplify complex financial instruments for everyday users, featuring real-time charting and seamless wallet integration.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 10 -->
+            <div class="panel" data-index="10">
+                <div class="panel-number">10</div>
+                <div class="panel-content">
+                    <div class="content-inner">
+                        <div class="panel-header">
+                            <div class="panel-meta">Immersive Web</div>
+                            <h2 class="panel-title serif-text">STELLAR VR EXPERIENCE</h2>
+                        </div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=1200&auto=format&fit=crop" alt="Virtual Reality" class="panel-img">
+                        </div>
+                        <div class="panel-description">
+                            <div class="desc-col">
+                                A WebXR educational experience that allows students to explore the solar system in virtual reality directly from their web browsers, using Three.js and A-Frame.
+                            </div>
+                            <div class="desc-col">
+                                Adopted by multiple school districts to enhance remote learning, providing an interactive, gamified approach to astronomy and planetary science.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const panels = document.querySelectorAll('.panel');
+            const preloader = document.getElementById('preloader');
+            const introElements = document.querySelectorAll('.intro-hidden');
+
+            // --- Intro Animation Sequence ---
+            setTimeout(() => {
+                // Fade out preloader
+                preloader.style.opacity = '0';
+                
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    
+                    // Stagger intro elements
+                    introElements.forEach((el, index) => {
+                        setTimeout(() => {
+                            el.classList.add('intro-visible');
+                        }, index * 200);
+                    });
+
+                    // Trigger initial panel animation specifically if needed
+                    // (It's already 'active' via HTML, CSS handles the initial state)
+
+                }, 1000); // Wait for preloader fade out
+            }, 1500); // Show preloader for 1.5s
+
+
+            // --- Accordion Logic ---
+            
+            // Function to handle panel activation
+            function activatePanel(panelToActivate) {
+                // If it's already active, do nothing
+                if (panelToActivate.classList.contains('active')) return;
+
+                // Remove active class from all panels
+                panels.forEach(p => p.classList.remove('active'));
+
+                // Add active class to clicked panel
+                panelToActivate.classList.add('active');
+
+                // Adjust specific widths based on position to create the fluid effect seen in the video
+                // In a perfect flex layout this isn't strictly necessary, but manual control 
+                // sometimes yields closer results to complex motion graphics.
+                // We rely mainly on the CSS flex/width transitions.
+            }
+
+            // Add event listeners to each panel
+            panels.forEach(panel => {
+                // Use click for better reliability across devices, 
+                // though hover could also be used (mouseenter)
+                panel.addEventListener('click', function() {
+                    activatePanel(this);
+                });
+
+                // Optional: Hover effect (might be too jumpy depending on user behavior)
+                // panel.addEventListener('mouseenter', function() {
+                //    activatePanel(this);
+                // });
+            });
+
+            // Initialize background images parallax effect based on mouse movement within active panel
+            const showcase = document.querySelector('.showcase-container');
+            
+            showcase.addEventListener('mousemove', (e) => {
+                const activePanel = document.querySelector('.panel.active');
+                if(!activePanel) return;
+
+                const img = activePanel.querySelector('.panel-img');
+                if(!img) return;
+
+                // Calculate mouse position relative to center of screen
+                const x = (e.clientX / window.innerWidth - 0.5) * 20; // Max movement 20px
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+                // Apply slight transform
+                // We don't want to override the CSS scale transform, so we use translate
+                img.style.transform = `scale(1.05) translate(${-x}px, ${-y}px)`;
+            });
+
+            // Reset transform when mouse leaves
+            showcase.addEventListener('mouseleave', () => {
+                const activePanel = document.querySelector('.panel.active');
+                if(!activePanel) return;
+                const img = activePanel.querySelector('.panel-img');
+                if(img) img.style.transform = `scale(1)`;
+            });
+        });
+    </script>
+</body>
+</html>
